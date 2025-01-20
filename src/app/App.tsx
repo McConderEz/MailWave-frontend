@@ -33,8 +33,12 @@ export default function Header() {
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
         <div className="flex flex-row items-center justify-between py-2 px-3">
-          <NavLink to="/" className="text-2xl">MailWave</NavLink>
-          <Button color="inherit">Войти</Button>
+          <NavLink to="/" className="text-2xl">
+            MailWave
+          </NavLink>
+          <NavLink to="/login" color="inherit">
+            Войти
+          </NavLink>
         </div>
       </AppBar>
       <Drawer
