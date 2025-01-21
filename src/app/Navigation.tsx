@@ -13,18 +13,41 @@ import {
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { NavLink } from "react-router-dom";
+import { AuthContext } from "../contexts/auth/AuthContext";
+import { useContext } from "react";
 
 const drawerWidth = 240;
 
-export function App() {
+export function Navigation() {
   return (
     <div>
-      <Header />
+      <SlideBar />
     </div>
   );
 }
 
-export default function Header() {
+export function Header() {
+  const accessToken = useContext(AuthContext)?.accessToken;
+
+  return (
+    <div className="flex flex-row items-center justify-between py-2 px-3">
+      <NavLink to="/" className="text-2xl">
+        MailWave
+      </NavLink>
+      { accessToken === null ? (
+        <NavLink to="/profile" color="inherit">
+          Профиль
+        </NavLink>
+      ) : (
+        <NavLink to="/login" color="inherit">
+          Войти
+        </NavLink>
+      )}
+    </div>
+  );
+}
+
+export default function SlideBar() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -32,14 +55,7 @@ export default function Header() {
         position="fixed"
         sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
       >
-        <div className="flex flex-row items-center justify-between py-2 px-3">
-          <NavLink to="/" className="text-2xl">
-            MailWave
-          </NavLink>
-          <NavLink to="/login" color="inherit">
-            Войти
-          </NavLink>
-        </div>
+        <Header />
       </AppBar>
       <Drawer
         variant="permanent"
