@@ -2,6 +2,7 @@ import { createContext, useEffect, useLayoutEffect, useState } from "react";
 import { User } from "../../models/User";
 import { AccountsService } from "../../api/accounts";
 import { api } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {
   accessToken: string | undefined;
@@ -40,9 +41,9 @@ export const AuthProvider = ({ children }: Props) => {
     const refreshInterceptor = api.interceptors.response.use(
       (config) => config,
       async (error) => {
-        const originalRequest = error.config;
-
         if (error.response.status === 401) {
+          const originalRequest = error.config;
+
           try {
             const response = await AccountsService.refresh();
 
@@ -53,7 +54,8 @@ export const AuthProvider = ({ children }: Props) => {
             }`;
 
             return api(originalRequest);
-          } catch {
+          } catch (error) {
+            console.log(error);
             setAccessToken(undefined);
           }
         }
@@ -71,6 +73,8 @@ export const AuthProvider = ({ children }: Props) => {
     try {
       const response = await AccountsService.login(email, password);
       setAccessToken(response.data.result!.accessToken);
+
+      return true;
     } catch {
       console.log("error");
     }

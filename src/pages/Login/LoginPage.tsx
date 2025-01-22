@@ -5,6 +5,7 @@ import { AccountsService } from "../../api/accounts";
 import { useState } from "react";
 import { api } from "../../api/api";
 import { useAuth } from "../../contexts/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 type LoginFields = {
   email: string;
@@ -19,9 +20,14 @@ export function LoginPage() {
   } = useForm<LoginFields>();
 
   const { login, accessToken } = useAuth();
+  const navigate = useNavigate();
 
   const onSubmit = async (data: LoginFields) => {
     await login(data.email, data.password);
+
+    //TODO: Проблемка при авторизации (нужно как-то обработать успех)
+    console.log(accessToken);
+    if (accessToken !== undefined) navigate("/");
   };
 
   return (

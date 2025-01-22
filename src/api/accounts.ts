@@ -6,7 +6,7 @@ import { api, API_URL } from "./api";
 export class AccountsService {
   static async refresh() {
     return axios.post<Envelope<LoginResponse>>(
-      API_URL + "Account/authentification",
+      API_URL + "Account/refreshing",
       {},
       {
         withCredentials: true,
@@ -22,5 +22,9 @@ export class AccountsService {
       email,
       password,
     });
+  }
+
+  static async logout() {
+    return api.post("Account/logout");
   }
 }

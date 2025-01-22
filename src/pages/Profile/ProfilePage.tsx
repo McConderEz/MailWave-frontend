@@ -1,7 +1,10 @@
 import { AppBar, Avatar, Box } from "@mui/material";
 import { Header } from "../../app/Navigation";
+import { useContext } from "react";
+import { AuthContext } from "../../contexts/auth/AuthContext";
 
 export function ProfilePage() {
+  const accessToken = useContext(AuthContext)?.accessToken;
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar

@@ -12,9 +12,10 @@ import {
   Toolbar,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/auth/AuthContext";
 import { useContext } from "react";
+import { AccountsService } from "../api/accounts";
 
 const drawerWidth = 240;
 
@@ -28,21 +29,32 @@ export function Navigation() {
 
 export function Header() {
   const accessToken = useContext(AuthContext)?.accessToken;
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    AccountsService.logout();
+    navigate("/login");
+  };
 
   return (
     <div className="flex flex-row items-center justify-between py-2 px-3">
       <NavLink to="/" className="text-2xl">
         MailWave
       </NavLink>
-      { accessToken === null ? (
-        <NavLink to="/profile" color="inherit">
-          Профиль
-        </NavLink>
-      ) : (
-        <NavLink to="/login" color="inherit">
-          Войти
-        </NavLink>
-      )}
+      <div className="flex flex-row items-center">
+        {accessToken === undefined ? (
+          <NavLink to="/login" color="inherit" className="mr-4">
+            Войти
+          </NavLink>
+        ) : (
+          <>
+            <NavLink to="/profile" color="inherit" className="mr-4">
+              Профиль
+            </NavLink>
+            <Button onClick={handleLogout}>Выход</Button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
