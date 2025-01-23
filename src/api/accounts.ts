@@ -25,6 +25,6 @@ export class AccountsService {
   }
 
   static async logout() {
-    return api.post("Account/logout");
+    return api.post("Account/deletion");
   }
 }

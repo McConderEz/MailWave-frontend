@@ -8,6 +8,7 @@ type AuthContextType = {
   accessToken: string | undefined;
   user: User | undefined;
   login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -80,8 +81,16 @@ export const AuthProvider = ({ children }: Props) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      await AccountsService.logout();
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ accessToken, user, login }}>
+    <AuthContext.Provider value={{ accessToken, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
