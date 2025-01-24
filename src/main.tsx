@@ -5,11 +5,14 @@ import { darkTheme } from "./theme";
 import { router } from "./app/router";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./contexts/auth/AuthContext";
+import { SelectedFolderProvider } from "./contexts/mail/SelectedFolderContext";
 
 createRoot(document.getElementById("root")!).render(
   <ThemeProvider theme={darkTheme}>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <SelectedFolderProvider>
+        <RouterProvider router={router} />
+      </SelectedFolderProvider>
     </AuthProvider>
   </ThemeProvider>
 );

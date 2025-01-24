@@ -3,7 +3,6 @@ import {
   Button,
   Box,
   CssBaseline,
-  Divider,
   Drawer,
   List,
   ListItem,
@@ -14,8 +13,9 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/auth/AuthContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AccountsService } from "../api/accounts";
+import { useSelectedFolder } from "../contexts/mail/useSelectedFolder";
 
 const drawerWidth = 240;
 
@@ -60,6 +60,13 @@ export function Header() {
 }
 
 export default function SlideBar() {
+  const { setSelectedIndex } = useSelectedFolder();
+
+  const handleListItemClick = (index: number) => {
+    console.log(index);
+    setSelectedIndex(index);
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -88,25 +95,16 @@ export default function SlideBar() {
             </Button>
           </div>
           <List>
-            {["Входящие", "Избранные", "Отправленные", "Черновики"].map(
+            {["Входящие", "Отправленные", "Черновики", "Корзина", "Спам"].map(
               (text, index) => (
                 <ListItem key={text} disablePadding>
-                  <ListItemButton>
+                  <ListItemButton onClick={() => handleListItemClick(index)}>
+                    <h1>{index}</h1>
                     <ListItemText primary={text} />
                   </ListItemButton>
                 </ListItem>
               )
             )}
-          </List>
-          <Divider />
-          <List>
-            {["Вся почта", "Корзина", "Спам"].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
           </List>
         </Box>
       </Drawer>

@@ -3,6 +3,7 @@ import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { MailService } from "../../api/mails";
 import { useEffect, useState } from "react";
 import { Letter } from "../../models/Letter";
+import { useSelectedFolder } from "../../contexts/mail/useSelectedFolder";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -12,20 +13,21 @@ const columns: GridColDef[] = [
   { field: "body", headerName: "Содержимое", flex: 1 },
 ];
 
-export function MailPage() {
+export function MailPage(emailFolder: number) {
+  const { selectedIndex } = useSelectedFolder();
   const [rows, setRows] = useState<Letter[]>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 1,
     pageSize: 15,
   });
-  const [loading, setLoading] = useState<boolean>(false); // Состояние для загрузки
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchMessages = async () => {
-      setLoading(true); // Устанавливаем загрузку в true перед запросом
+      setLoading(true);
       try {
         const response = await MailService.getMessagesFromFolderWithPagination(
-          1,
+          selectedIndex,
           paginationModel.page,
           paginationModel.pageSize
         );
@@ -35,16 +37,16 @@ export function MailPage() {
       } catch (error) {
         console.error("Ошибка при получении сообщений:", error);
       } finally {
-        setLoading(false); // Устанавливаем загрузку в false после завершения запроса
+        setLoading(false);
       }
     };
 
     fetchMessages();
-  }, [paginationModel]);
+  }, [paginationModel.page, paginationModel.pageSize, selectedIndex]);
 
   return (
     <Paper sx={{ height: "100%", width: "100%" }}>
-      {loading ? ( // Условный рендеринг лоудера
+      {loading ? (
         <Box
           sx={{
             display: "flex",
@@ -60,11 +62,9 @@ export function MailPage() {
           rows={rows}
           columns={columns}
           pagination
+          initialState={{ pagination: { paginationModel } }}
           paginationMode="server"
           paginationModel={paginationModel}
-          onPaginationModelChange={(newModel) => {
-            setPaginationModel(newModel);
-          }}
           checkboxSelection
           sx={{ border: 0 }}
         />
