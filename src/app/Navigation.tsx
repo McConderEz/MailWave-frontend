@@ -99,7 +99,6 @@ export default function SlideBar() {
               (text, index) => (
                 <ListItem key={text} disablePadding>
                   <ListItemButton onClick={() => handleListItemClick(index)}>
-                    <h1>{index}</h1>
                     <ListItemText primary={text} />
                   </ListItemButton>
                 </ListItem>
