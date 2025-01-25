@@ -1,4 +1,4 @@
-import { Paper, CircularProgress, Box } from "@mui/material";
+import { Paper, CircularProgress, Box, Button } from "@mui/material";
 import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
 import { MailService } from "../../api/mails";
 import { useEffect, useState } from "react";
@@ -13,13 +13,14 @@ const columns: GridColDef[] = [
   { field: "body", headerName: "Содержимое", flex: 1 },
 ];
 
-export function MailPage(emailFolder: number) {
+export function MailPage() {
   const { selectedIndex } = useSelectedFolder();
   const [rows, setRows] = useState<Letter[]>([]);
   const [paginationModel, setPaginationModel] = useState<GridPaginationModel>({
     page: 1,
     pageSize: 15,
   });
+
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -42,7 +43,11 @@ export function MailPage(emailFolder: number) {
     };
 
     fetchMessages();
-  }, [paginationModel.page, paginationModel.pageSize, selectedIndex]);
+  }, [paginationModel, selectedIndex]);
+
+  const handlePaginationModelChange = (model: GridPaginationModel) => {
+    setPaginationModel(model);
+  };
 
   return (
     <Paper sx={{ height: "100%", width: "100%" }}>
@@ -62,9 +67,9 @@ export function MailPage(emailFolder: number) {
           rows={rows}
           columns={columns}
           pagination
-          initialState={{ pagination: { paginationModel } }}
           paginationMode="server"
           paginationModel={paginationModel}
+          onPaginationModelChange={handlePaginationModelChange}
           checkboxSelection
           sx={{ border: 0 }}
         />

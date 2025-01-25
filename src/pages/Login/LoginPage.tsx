@@ -1,9 +1,6 @@
 import { Button, Skeleton, TextField } from "@mui/material";
 import { ContentBlock } from "../../components/ContentBlock";
 import { useForm } from "react-hook-form";
-import { AccountsService } from "../../api/accounts";
-import { useState } from "react";
-import { api } from "../../api/api";
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useNavigate } from "react-router-dom";
 

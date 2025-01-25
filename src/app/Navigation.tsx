@@ -13,7 +13,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/auth/AuthContext";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { AccountsService } from "../api/accounts";
 import { useSelectedFolder } from "../contexts/mail/useSelectedFolder";
 
