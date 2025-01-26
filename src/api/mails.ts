@@ -17,4 +17,14 @@ export class MailService {
       },
     });
   }
+
+  static async getMessagesCountFromFolder(
+    folder: number
+  ): Promise<AxiosResponse<Envelope<number>>> {
+    return api.get<Envelope<number>>("Mail/messages-count", {
+      params: {
+        selectedFolder: folder,
+      },
+    });
+  }
 }
