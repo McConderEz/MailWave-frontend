@@ -27,4 +27,18 @@ export class MailService {
       },
     });
   }
+
+  static async getMessageFromFolderById(
+    messageId: number,
+    emailFolder: number
+  ): Promise<AxiosResponse<Envelope<Letter>>> {
+    return api.get<Envelope<Letter>>(
+      `Mail/${messageId}/message-from-folder-by-id`,
+      {
+        params: {
+          emailFolder: emailFolder,
+        },
+      }
+    );
+  }
 }
