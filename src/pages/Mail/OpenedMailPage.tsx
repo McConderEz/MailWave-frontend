@@ -12,6 +12,7 @@ import { useParams } from "react-router-dom";
 import { Letter } from "../../models/Letter";
 import { useEffect, useState } from "react";
 import { MailService } from "../../api/mails";
+import DOMPurify from "dompurify";
 
 const maxFileNameLength = 20;
 
@@ -84,6 +85,7 @@ export function OpenedMailPage() {
         </Box>
       ) : (
         <>
+          <h1 className="pl-6 pt-4 text-[26px]">{letter?.subject}</h1>
           <div className="flex flex-row justify-between">
             <h1 className="pl-6 pt-4 font-bold">{letter?.from}</h1>
             <h1 className="pr-6 pt-4 font-bold">
@@ -92,7 +94,12 @@ export function OpenedMailPage() {
           </div>
           <p className="pl-6 font-mono text-gray-300">кому: {letter?.to}</p>
           <Divider />
-          <Typography className="pl-6 pt-2 pr-6">{letter?.body}</Typography>
+          <Typography
+            className="pl-6 pt-2 pr-6"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(letter?.body ?? ""),
+            }}
+          />
           <Divider />
           <h1 className="pl-6 pt-4 font-bold">Прикрепленные файлы</h1>
           <div className="pl-6 pt-2 flex flex-wrap gap-2">
