@@ -1,9 +1,15 @@
 import { Paper, CircularProgress, Box } from "@mui/material";
-import { DataGrid, GridColDef, GridPaginationModel } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridColDef,
+  GridPaginationModel,
+  GridRowParams,
+} from "@mui/x-data-grid";
 import { MailService } from "../../api/mails";
 import { useCallback, useEffect, useState } from "react";
 import { Letter } from "../../models/Letter";
 import { useSelectedFolder } from "../../contexts/mail/useSelectedFolder";
+import { useNavigate } from "react-router-dom";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -17,11 +23,13 @@ export function MailPage() {
   const { selectedIndex } = useSelectedFolder();
   const [rows, setRows] = useState<Letter[]>([]);
   const [rowsCount, setRowsCount] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
     pageSize: 15,
     page: 1,
   });
-  const [loading, setLoading] = useState<boolean>(false);
+
+  const navigation = useNavigate();
 
   useEffect(() => {
     setPagination({ pageSize: 15, page: 1 });
@@ -63,6 +71,10 @@ export function MailPage() {
     []
   );
 
+  const handleRowClick = (params: GridRowParams) => {
+    navigation(`/opened-mail/${params.id}`);
+  };
+
   return (
     <Paper sx={{ height: "100%", width: "100%" }}>
       {loading ? (
@@ -84,7 +96,9 @@ export function MailPage() {
           paginationMode="server"
           paginationModel={pagination}
           onPaginationModelChange={handlePaginationChange}
+          onRowClick={handleRowClick}
           checkboxSelection
+          disableRowSelectionOnClick
           sx={{ border: 0 }}
         />
       )}

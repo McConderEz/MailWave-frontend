@@ -61,10 +61,12 @@ export function Header() {
 
 export default function SlideBar() {
   const { setSelectedIndex } = useSelectedFolder();
+  const navigate = useNavigate();
 
   const handleListItemClick = (index: number) => {
     console.log(index);
     setSelectedIndex(index);
+    navigate("/mail");
   };
 
   return (
