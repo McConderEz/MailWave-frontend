@@ -16,7 +16,19 @@ const columns: GridColDef[] = [
   { field: "from", headerName: "Отправитель", width: 200 },
   { field: "to", headerName: "Получатель", width: 200 },
   { field: "date", headerName: "Дата", width: 180 },
-  { field: "subject", headerName: "Тема", width: 150 },
+  { field: "subject", headerName: "Тема", width: 120 },
+  {
+    field: "isCrypted",
+    headerName: "Шифр",
+    width: 30,
+    renderCell: (params) => (params.value ? "+" : "-"),
+  },
+  {
+    field: "isSigned",
+    headerName: "Подпись",
+    width: 30,
+    renderCell: (params) => (params.value ? "+" : "-"),
+  },
   { field: "body", headerName: "Содержимое", flex: 1 },
 ];
 
@@ -73,7 +85,8 @@ export function MailPage() {
   );
 
   const handleRowClick = (params: GridRowParams) => {
-    navigation(`/opened-mail/${params.id}`);
+    const { id, isCrypted, isSigned } = params.row;
+    navigation(`/opened-mail/${id}?isCrypted=${isCrypted}&isSigned=${isSigned}`);
   };
 
   return (

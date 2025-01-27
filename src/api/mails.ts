@@ -41,4 +41,36 @@ export class MailService {
       }
     );
   }
+
+  static async getCryptedAndSignedMessageFromFolderById(
+    messageId: number,
+    emailFolder: number
+  ): Promise<AxiosResponse<Envelope<Letter>>> {
+    return api.get<Envelope<Letter>>(
+      `Mail/${messageId}/crypted-signed-message-from-folder-by-id`,
+      {
+        params: {
+          emailFolder: emailFolder,
+        },
+      }
+    );
+  }
+
+  static async verificationMessage(
+    messageId: number,
+    emailFolder: number
+  ): Promise<AxiosResponse<Envelope<string>>> {
+    return api.post<Envelope<string>>(
+      `Mail/verification-message`,
+      {
+        EmailFolder: emailFolder,
+        MessageId: messageId,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  }
 }

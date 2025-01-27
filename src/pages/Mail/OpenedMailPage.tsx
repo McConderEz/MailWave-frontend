@@ -3,16 +3,19 @@ import {
   Chip,
   CircularProgress,
   Divider,
+  IconButton,
   Tooltip,
   Typography,
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useSelectedFolder } from "../../contexts/mail/useSelectedFolder";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import { Letter } from "../../models/Letter";
 import { useEffect, useState } from "react";
 import { MailService } from "../../api/mails";
 import DOMPurify from "dompurify";
+import { DomainVerification } from "@mui/icons-material";
+import { VerificationModal } from "../../components/VerificationModal";
 
 const maxFileNameLength = 20;
 
@@ -21,6 +24,18 @@ export function OpenedMailPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const { id } = useParams<string>();
   const [letter, setLetter] = useState<Letter | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [verificationResult, setVerificationResult] = useState<string | null>(
+    null
+  );
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const isCrypted = queryParams.get("isCrypted");
+  const isSigned = queryParams.get("isSigned");
+
+  console.log(isCrypted);
+  console.log(isSigned);
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -28,10 +43,22 @@ export function OpenedMailPage() {
       try {
         if (id) {
           console.log(id);
-          const response = await MailService.getMessageFromFolderById(
-            Number(id),
-            selectedIndex
-          );
+
+          let response;
+
+          if (isCrypted || isSigned) {
+            response =
+              await MailService.getCryptedAndSignedMessageFromFolderById(
+                Number(id),
+                selectedIndex
+              );
+          } else {
+            response = await MailService.getMessageFromFolderById(
+              Number(id),
+              selectedIndex
+            );
+          }
+
           console.log(response.data.result!);
           if (response.data && response.data.result) {
             const result = response.data.result;
@@ -59,7 +86,22 @@ export function OpenedMailPage() {
     };
 
     fetchMessage();
-  }, [id, selectedIndex]);
+  }, [id, isCrypted, isSigned, selectedIndex]);
+
+  const handleVerify = async () => {
+    try {
+      const response = await MailService.verificationMessage(
+        parseInt(id!),
+        selectedIndex
+      );
+      setVerificationResult(response.data.result);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error verifying message:", error);
+      setVerificationResult("Error verifying message");
+      setIsModalOpen(true);
+    }
+  };
 
   const handleDownload = (fileName: string) => {
     console.log(`Downloading file: ${fileName}`);
@@ -123,8 +165,22 @@ export function OpenedMailPage() {
               />
             ))}
           </div>
+          {isSigned === "true" ? (
+            <div className="pl-4 pt-2">
+              <IconButton aria-label="check" onClick={handleVerify}>
+                <DomainVerification />
+              </IconButton>
+            </div>
+          ) : (
+            <div></div>
+          )}
         </>
       )}
+      <VerificationModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        result={verificationResult}
+      />
     </div>
   );
 }
