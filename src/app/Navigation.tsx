@@ -18,6 +18,7 @@ import { useContext, useState } from "react";
 import { AccountsService } from "../api/accounts";
 import { useSelectedFolder } from "../contexts/mail/useSelectedFolder";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { SendFriendRequestModal } from "../components/SendFriendRequestModal";
 
 const drawerWidth = 240;
 
@@ -69,6 +70,10 @@ export function Header() {
 export default function SlideBar() {
   const { setSelectedIndex } = useSelectedFolder();
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [sendRequestResult, setSendRequestResult] = useState<string | null>(
+    null
+  );
 
   const handleListItemClick = (index: number) => {
     console.log(index);
@@ -77,7 +82,14 @@ export default function SlideBar() {
   };
 
   const handleAddFriend = async () => {
-    //Implement
+    try {
+      setSendRequestResult(null);
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Error sending friend request:", error);
+      setSendRequestResult("Error sending request message");
+      setIsModalOpen(true);
+    }
   };
 
   return (
@@ -123,6 +135,11 @@ export default function SlideBar() {
           </List>
         </Box>
       </Drawer>
+      <SendFriendRequestModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        result={sendRequestResult}
+      />
     </Box>
   );
 }

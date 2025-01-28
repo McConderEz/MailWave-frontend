@@ -130,4 +130,12 @@ export class MailService {
       }
     );
   }
+
+  static async sendFriendRequest(
+    receiver: string
+  ): Promise<AxiosResponse<void>> {
+    return api.post<void>(`Mail/sending-friend-request`, {
+      Receiver: receiver,
+    });
+  }
 }
