@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import DownloadIcon from "@mui/icons-material/Download";
 import { useSelectedFolder } from "../../contexts/mail/useSelectedFolder";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Letter } from "../../models/Letter";
 import { useEffect, useState } from "react";
 import { MailService } from "../../api/mails";
@@ -28,6 +28,7 @@ export function OpenedMailPage() {
   const [verificationResult, setVerificationResult] = useState<string | null>(
     null
   );
+  const { navigate } = useNavigate();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
@@ -109,7 +110,13 @@ export function OpenedMailPage() {
   };
 
   const handleDelete = async () => {
-    // Implement deletion
+    try {
+      await MailService.deleteMessage(parseInt(id!), selectedIndex);
+      console.log(`message ${id} was deleted`);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleSave = async () => {

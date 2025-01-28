@@ -73,4 +73,21 @@ export class MailService {
       }
     );
   }
+
+  static async deleteMessage(
+    messageId: number,
+    emailFolder: number
+  ): Promise<AxiosResponse<void>> {
+    return api.post<void>(
+      `Mail/${messageId}/deletion-message`,
+      {
+        EmailFolder: emailFolder,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  }
 }
