@@ -9,6 +9,7 @@ import {
   ListItemButton,
   ListItemText,
   Toolbar,
+  IconButton,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -16,6 +17,7 @@ import { AuthContext } from "../contexts/auth/AuthContext";
 import { useContext } from "react";
 import { AccountsService } from "../api/accounts";
 import { useSelectedFolder } from "../contexts/mail/useSelectedFolder";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
 
 const drawerWidth = 240;
 
@@ -69,6 +71,10 @@ export default function SlideBar() {
     navigate("/mail");
   };
 
+  const handleAddFriend = async () => {
+    //Implement
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -95,6 +101,9 @@ export default function SlideBar() {
             <Button color="inherit" variant="contained" endIcon={<SendIcon />}>
               Отправить
             </Button>
+            <IconButton onClick={handleAddFriend}>
+              <PersonAddIcon />
+            </IconButton>
           </div>
           <List>
             {["Входящие", "Отправленные", "Черновики", "Корзина", "Спам"].map(
