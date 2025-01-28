@@ -9,6 +9,7 @@ type AuthContextType = {
   user: User | undefined;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  setAccessToken: (token: string | undefined) => void;
 };
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -70,12 +71,10 @@ export const AuthProvider = ({ children }: Props) => {
     };
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<void> => {
     try {
       const response = await AccountsService.login(email, password);
       setAccessToken(response.data.result!.accessToken);
-
-      return true;
     } catch {
       console.log("error");
     }
@@ -90,7 +89,7 @@ export const AuthProvider = ({ children }: Props) => {
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, user, login, logout }}>
+    <AuthContext.Provider value={{ accessToken, user, login, logout, setAccessToken }}>
       {children}
     </AuthContext.Provider>
   );

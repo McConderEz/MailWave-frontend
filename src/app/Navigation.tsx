@@ -14,7 +14,7 @@ import {
 import SendIcon from "@mui/icons-material/Send";
 import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from "../contexts/auth/AuthContext";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AccountsService } from "../api/accounts";
 import { useSelectedFolder } from "../contexts/mail/useSelectedFolder";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
@@ -31,11 +31,16 @@ export function Navigation() {
 
 export function Header() {
   const accessToken = useContext(AuthContext)?.accessToken;
+  const setAccessToken = useContext(AuthContext)?.setAccessToken;
   const navigate = useNavigate();
-
   const handleLogout = () => {
-    AccountsService.logout();
-    navigate("/login");
+    try {
+      AccountsService.logout();
+      setAccessToken(undefined);
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

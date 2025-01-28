@@ -3,6 +3,7 @@ import { ContentBlock } from "../../components/ContentBlock";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 type LoginFields = {
   email: string;
@@ -21,11 +22,13 @@ export function LoginPage() {
 
   const onSubmit = async (data: LoginFields) => {
     await login(data.email, data.password);
-
-    //TODO: Проблемка при авторизации (нужно как-то обработать успех)
-    console.log(accessToken);
-    if (accessToken !== undefined) navigate("/");
   };
+
+  useEffect(() => {
+    if (accessToken) {
+      navigate("/");
+    }
+  }, [accessToken, navigate]);
 
   return (
     <>

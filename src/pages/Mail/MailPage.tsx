@@ -36,6 +36,7 @@ export function MailPage() {
   const { selectedIndex } = useSelectedFolder();
   const [rows, setRows] = useState<Letter[]>([]);
   const [rowsCount, setRowsCount] = useState<number>(0);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [pagination, setPagination] = useState({
     pageSize: 15,
@@ -86,7 +87,9 @@ export function MailPage() {
 
   const handleRowClick = (params: GridRowParams) => {
     const { id, isCrypted, isSigned } = params.row;
-    navigation(`/opened-mail/${id}?isCrypted=${isCrypted}&isSigned=${isSigned}`);
+    navigation(
+      `/opened-mail/${id}?isCrypted=${isCrypted}&isSigned=${isSigned}`
+    );
   };
 
   return (
@@ -111,7 +114,6 @@ export function MailPage() {
           paginationModel={pagination}
           onPaginationModelChange={handlePaginationChange}
           onRowClick={handleRowClick}
-          checkboxSelection
           disableRowSelectionOnClick
           sx={{ border: 0 }}
         />
