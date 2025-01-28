@@ -120,7 +120,13 @@ export function OpenedMailPage() {
   };
 
   const handleSave = async () => {
-    // Implement deletion
+    try {
+      await MailService.saveMessage([parseInt(id!)], selectedIndex);
+      console.log(`message ${id} was saved`);
+      navigate("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

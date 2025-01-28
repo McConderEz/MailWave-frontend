@@ -90,4 +90,22 @@ export class MailService {
       }
     );
   }
+
+  static async saveMessage(
+    messageIds: number[],
+    emailFolder: number
+  ): Promise<AxiosResponse<void>> {
+    return api.post<void>(
+      `Mail/saving-message`,
+      {
+        EmailFolder: emailFolder,
+        MessageIds: messageIds,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  }
 }
