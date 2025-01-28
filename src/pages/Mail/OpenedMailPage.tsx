@@ -14,7 +14,12 @@ import { Letter } from "../../models/Letter";
 import { useEffect, useState } from "react";
 import { MailService } from "../../api/mails";
 import DOMPurify from "dompurify";
-import { Delete, DomainVerification, Save } from "@mui/icons-material";
+import {
+  Delete,
+  DomainVerification,
+  PersonAddAlt,
+  Save,
+} from "@mui/icons-material";
 import { VerificationModal } from "../../components/VerificationModal";
 
 const maxFileNameLength = 20;
@@ -34,6 +39,7 @@ export function OpenedMailPage() {
   const queryParams = new URLSearchParams(location.search);
   const isCrypted = queryParams.get("isCrypted");
   const isSigned = queryParams.get("isSigned");
+  const isFriendRequest = queryParams.get("isFriendRequest");
 
   console.log(isCrypted);
   console.log(isSigned);
@@ -53,6 +59,11 @@ export function OpenedMailPage() {
                 Number(id),
                 selectedIndex
               );
+          } else if (isFriendRequest) {
+            response = await MailService.getMessageFromFolderById(
+              Number(id),
+              selectedIndex
+            );
           } else {
             response = await MailService.getMessageFromFolderById(
               Number(id),
@@ -87,7 +98,7 @@ export function OpenedMailPage() {
     };
 
     fetchMessage();
-  }, [id, isCrypted, isSigned, selectedIndex]);
+  }, [id, isCrypted, isFriendRequest, isSigned, selectedIndex]);
 
   const handleVerify = async () => {
     try {
@@ -135,6 +146,15 @@ export function OpenedMailPage() {
       await MailService.saveMessage([parseInt(id!)], selectedIndex);
       console.log(`message ${id} was saved`);
       navigate("/mail");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleAcceptFriendship = async () => {
+    try {
+      await MailService.acceptFriendship(parseInt(id!), selectedIndex);
+      console.log("accepted friendship");
     } catch (error) {
       console.log(error);
     }
@@ -211,6 +231,15 @@ export function OpenedMailPage() {
             <div className="pl-4 pt-2">
               <IconButton aria-label="check" onClick={handleVerify}>
                 <DomainVerification />
+              </IconButton>
+            </div>
+          ) : (
+            <div></div>
+          )}
+          {isFriendRequest === "true" ? (
+            <div className="pl-4 pt-2">
+              <IconButton aria-label="check" onClick={handleAcceptFriendship}>
+                <PersonAddAlt />
               </IconButton>
             </div>
           ) : (

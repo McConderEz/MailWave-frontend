@@ -86,9 +86,14 @@ export function MailPage() {
   );
 
   const handleRowClick = (params: GridRowParams) => {
-    const { id, isCrypted, isSigned } = params.row;
+    const { id, isCrypted, isSigned, subject } = params.row;
+    const subjectString: string = subject.toString();
+    let isFriendRequest: boolean = false;
+
+    if (subjectString.includes("#@FriendRequest")) isFriendRequest = true;
+
     navigation(
-      `/opened-mail/${id}?isCrypted=${isCrypted}&isSigned=${isSigned}`
+      `/opened-mail/${id}?isCrypted=${isCrypted}&isSigned=${isSigned}&isFriendRequest=${isFriendRequest}`
     );
   };
 

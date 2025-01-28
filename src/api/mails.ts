@@ -138,4 +138,22 @@ export class MailService {
       Receiver: receiver,
     });
   }
+
+  static async acceptFriendship(
+    messageId: number,
+    emailFolder: number
+  ): Promise<AxiosResponse<void>> {
+    return api.post<void>(
+      `Mail/accepting-friend-request`,
+      {
+        EmailFolder: emailFolder,
+        MessageId: messageId,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  }
 }
