@@ -28,7 +28,7 @@ export function OpenedMailPage() {
   const [verificationResult, setVerificationResult] = useState<string | null>(
     null
   );
-  const navigator  = useNavigate();
+  const navigate = useNavigate();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
@@ -104,16 +104,27 @@ export function OpenedMailPage() {
     }
   };
 
-  const handleDownload = (fileName: string) => {
+  const handleDownload = async (fileName: string) => {
     console.log(`Downloading file: ${fileName}`);
-    // Implement your download logic here
+    try {
+      await MailService.saveFile(
+        "D:\\",
+        fileName,
+        parseInt(id!),
+        selectedIndex
+      );
+
+      console.log(`File ${fileName} downloaded`);
+    } catch (error) {
+      console.error("Error downloading file:", error);
+    }
   };
 
   const handleDelete = async () => {
     try {
       await MailService.deleteMessage(parseInt(id!), selectedIndex);
       console.log(`message ${id} was deleted`);
-      navigator("/mail");
+      navigate("/mail");
     } catch (error) {
       console.log(error);
     }
@@ -123,7 +134,7 @@ export function OpenedMailPage() {
     try {
       await MailService.saveMessage([parseInt(id!)], selectedIndex);
       console.log(`message ${id} was saved`);
-      navigator("/mail");
+      navigate("/mail");
     } catch (error) {
       console.log(error);
     }

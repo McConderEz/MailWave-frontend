@@ -108,4 +108,26 @@ export class MailService {
       }
     );
   }
+
+  static async saveFile(
+    directoryPath: string,
+    fileName: string,
+    messageId: number,
+    emailFolder: number
+  ): Promise<AxiosResponse<void>> {
+    return api.post<void>(
+      `Mail/saving-files`,
+      {
+        DirectoryPath: directoryPath,
+        EmailFolder: emailFolder,
+        MessageId: messageId,
+        FileName: fileName,
+      },
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+  }
 }
