@@ -199,6 +199,7 @@ export function OpenedMailPage() {
           <p className="pl-6 font-mono text-gray-300">кому: {letter?.to}</p>
           <Divider />
           <Typography
+            style={{ wordWrap: "break-word" }}
             className="pl-6 pt-2 pr-6"
             dangerouslySetInnerHTML={{
               __html: DOMPurify.sanitize(letter?.body ?? ""),
