@@ -28,7 +28,7 @@ export function OpenedMailPage() {
   const [verificationResult, setVerificationResult] = useState<string | null>(
     null
   );
-  const { navigate } = useNavigate();
+  const navigator  = useNavigate();
   const location = useLocation();
 
   const queryParams = new URLSearchParams(location.search);
@@ -113,7 +113,7 @@ export function OpenedMailPage() {
     try {
       await MailService.deleteMessage(parseInt(id!), selectedIndex);
       console.log(`message ${id} was deleted`);
-      navigate("/");
+      navigator("/mail");
     } catch (error) {
       console.log(error);
     }
@@ -123,7 +123,7 @@ export function OpenedMailPage() {
     try {
       await MailService.saveMessage([parseInt(id!)], selectedIndex);
       console.log(`message ${id} was saved`);
-      navigate("/");
+      navigator("/mail");
     } catch (error) {
       console.log(error);
     }
