@@ -14,7 +14,7 @@ import { Letter } from "../../models/Letter";
 import { useEffect, useState } from "react";
 import { MailService } from "../../api/mails";
 import DOMPurify from "dompurify";
-import { DomainVerification } from "@mui/icons-material";
+import { Delete, DomainVerification, Save } from "@mui/icons-material";
 import { VerificationModal } from "../../components/VerificationModal";
 
 const maxFileNameLength = 20;
@@ -108,6 +108,14 @@ export function OpenedMailPage() {
     // Implement your download logic here
   };
 
+  const handleDelete = async () => {
+    // Implement deletion
+  };
+
+  const handleSave = async () => {
+    // Implement deletion
+  };
+
   return (
     <div>
       {loading ? (
@@ -127,7 +135,17 @@ export function OpenedMailPage() {
         </Box>
       ) : (
         <>
-          <h1 className="pl-6 pt-4 text-[26px]">{letter?.subject}</h1>
+          <div className="flex flex-row justify-between">
+            <h1 className="pl-6 pt-4 text-[26px]">{letter?.subject}</h1>
+            <div className="pr-6 pt-4">
+              <IconButton aria-label="check" onClick={handleSave}>
+                <Save />
+              </IconButton>
+              <IconButton aria-label="check" onClick={handleDelete}>
+                <Delete />
+              </IconButton>
+            </div>
+          </div>
           <div className="flex flex-row justify-between">
             <h1 className="pl-6 pt-4 font-bold">{letter?.from}</h1>
             <h1 className="pr-6 pt-4 font-bold">
