@@ -5,6 +5,7 @@ import { ProfilePage } from "../pages/Profile/ProfilePage";
 import { OpenedMailPage } from "../pages/Mail/OpenedMailPage";
 import { ContentBlock } from "../components/ContentBlock";
 import { MailPage } from "../pages/Mail/MailPage";
+import { SendMailPage } from "../pages/Mail/SendMailPage";
 
 export type Props = {
   children: React.ReactNode;
@@ -28,6 +29,14 @@ export const router = createBrowserRouter([
         element: (
           <ContentBlock>
             <MailPage />
+          </ContentBlock>
+        ),
+      },
+      {
+        path: `/send-mail`,
+        element: (
+          <ContentBlock>
+            <SendMailPage />
           </ContentBlock>
         ),
       },

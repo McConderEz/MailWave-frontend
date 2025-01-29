@@ -92,6 +92,10 @@ export default function SlideBar() {
     }
   };
 
+  const handleSendButton = () => {
+    navigate("/send-mail");
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -115,7 +119,12 @@ export default function SlideBar() {
         <Toolbar />
         <Box sx={{ overflow: "auto" }}>
           <div className="flex flex-row items-center justify-between py-2 px-3">
-            <Button color="inherit" variant="contained" endIcon={<SendIcon />}>
+            <Button
+              onClick={handleSendButton}
+              color="inherit"
+              variant="contained"
+              endIcon={<SendIcon />}
+            >
               Отправить
             </Button>
             <IconButton onClick={handleAddFriend}>
