@@ -20,21 +20,56 @@ import FormatSizeIcon from "@mui/icons-material/FormatSize";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useRef, useState } from "react";
 import { MailService } from "../../api/mails";
 import { useNavigate } from "react-router-dom";
 import { Close } from "@mui/icons-material";
 
-const DropdownMenu = () => {
+interface SelectedTextRange {
+  start: number | null;
+  end: number | null;
+}
+
+const DropdownMenu: React.FC<{
+  setBody: (newBody: string) => void;
+  textFieldRef: React.RefObject<HTMLTextAreaElement | HTMLInputElement>; // Добавляем пропс
+}> = ({ setBody, textFieldRef }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  // Обработчик открытия меню
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // Обработчик закрытия меню
+  const getSelectedText = (): SelectedTextRange => {
+    const textField = textFieldRef.current;
+    console.log(textField?.value);
+    if (textField) {
+      return {
+        start: textField.selectionStart,
+        end: textField.selectionEnd,
+      };
+    }
+    return { start: null, end: null };
+  };
+
+  const wrapSelectedTextWithTag = (tag: string) => {
+    const { start, end } = getSelectedText();
+    if (start !== null && end !== null) {
+      const beforeSelectedText =
+        textFieldRef.current?.value.slice(0, start) || "";
+      const selectedText = textFieldRef.current?.value.slice(start, end) || "";
+      const afterSelectedText = textFieldRef.current?.value.slice(end) || "";
+      const newBody = `${beforeSelectedText}<${tag}>${selectedText}</${tag}>${afterSelectedText}`;
+      setBody(newBody);
+    }
+  };
+
+  const handleMenuItemClick = (tag: string) => {
+    wrapSelectedTextWithTag(tag);
+    handleClose();
+  };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -61,24 +96,27 @@ const DropdownMenu = () => {
           },
         }}
       >
-        {/* Элементы меню */}
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => handleMenuItemClick("i")}>
           <FormatItalicIcon />
           Курсив
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => handleMenuItemClick("b")}>
           <FormatBoldIcon />
           Жирный
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem
+          onClick={() => handleMenuItemClick('span style="color: red;"')}
+        >
           <FormatColorTextIcon />
           Цвет текста
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem onClick={() => handleMenuItemClick("u")}>
           <FormatUnderlinedIcon />
           Подчеркивание
         </MenuItem>
-        <MenuItem onClick={handleClose}>
+        <MenuItem
+          onClick={() => handleMenuItemClick('span style="font-size: 20px;"')}
+        >
           <FormatSizeIcon />
           Размер шрифта
         </MenuItem>
@@ -92,6 +130,8 @@ export function SendMailPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
   const currentDateTime = new Date();
+
+  const textFieldRef = useRef<HTMLTextAreaElement | HTMLInputElement>(null);
 
   const [receivers, setReceiver] = useState<string>("");
   const [subject, setSubject] = useState<string | null>("");
@@ -268,6 +308,7 @@ export function SendMailPage() {
           className="flex flex-col mt-6"
           value={body}
           onChange={handleBodyChange}
+          inputRef={textFieldRef}
         />
       </div>
       <div className="flex flex-col ml-6">
@@ -297,7 +338,7 @@ export function SendMailPage() {
         <IconButton aria-label="check" onClick={handleAttachmentClick}>
           <AttachFileIcon />
         </IconButton>
-        <DropdownMenu />
+        <DropdownMenu setBody={setBody} textFieldRef={textFieldRef} />
       </div>
 
       {/* Меню для кнопки "Отправить" */}
