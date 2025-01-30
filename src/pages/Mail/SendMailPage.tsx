@@ -22,6 +22,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useState } from "react";
 import { MailService } from "../../api/mails";
+import { useNavigate } from "react-router-dom";
+import { Close } from "@mui/icons-material";
 
 const DropdownMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -90,9 +92,33 @@ export function SendMailPage() {
   const [openDialog, setOpenDialog] = useState(false);
   const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
 
-  const [receiver, setReceiver] = useState<string>("");
+  const [receivers, setReceiver] = useState<string>("");
   const [subject, setSubject] = useState<string | null>("");
   const [body, setBody] = useState<string | null>("");
+
+  const [attachments, setAttachments] = useState<File[]>([]);
+  const [openAttachmentDialog, setOpenAttachmentDialog] = useState(false);
+
+  const handleAttachmentClick = () => {
+    setOpenAttachmentDialog(true);
+  };
+
+  const handleAttachmentClose = () => {
+    setOpenAttachmentDialog(false);
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      const files = Array.from(event.target.files);
+      setAttachments((prev) => [...prev, ...files]);
+    }
+  };
+
+  const handleRemoveAttachment = (index: number) => {
+    setAttachments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const navigation = useNavigate();
 
   const handleReceiverChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setReceiver(event.target.value);
@@ -117,11 +143,26 @@ export function SendMailPage() {
   const handleSendNow = async () => {
     try {
       handleMenuClose();
-      if (receiver !== null) {
-        await MailService.SendMessage(subject, body, [receiver]);
+      if (receivers) {
+        const formData = new FormData();
+        formData.append("subject", subject!);
+        formData.append("body", body!);
+
+        const receiversArray = receivers.split(" ");
+
+        for (let i = 0; i < receiversArray.length; i++) {
+          formData.append(`Receivers[${i}]`, receiversArray[i]);
+        }
+
+        attachments.forEach((file) => {
+          formData.append("attachments", file);
+        });
+
+        await MailService.SendMessage(formData);
         console.log("Письмо отправлено сейчас");
+        navigation("/");
       } else {
-        console.log("receiver was null");
+        console.log("Получатель не указан");
       }
     } catch (error) {
       console.log(error);
@@ -153,7 +194,7 @@ export function SendMailPage() {
           id="standard-basic"
           label="Получатель"
           variant="standard"
-          value={receiver}
+          value={receivers}
           onChange={handleReceiverChange}
         />
         <TextField
@@ -187,7 +228,7 @@ export function SendMailPage() {
         <Button variant="contained" onClick={handleMenuClick}>
           Отправить
         </Button>
-        <IconButton aria-label="check">
+        <IconButton aria-label="check" onClick={handleAttachmentClick}>
           <AttachFileIcon />
         </IconButton>
         <DropdownMenu />
@@ -221,6 +262,29 @@ export function SendMailPage() {
           <Button onClick={handleScheduleConfirm}>Запланировать</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Диалог для добавления вложений */}
+      <Dialog open={openAttachmentDialog} onClose={handleAttachmentClose}>
+        <DialogTitle>Добавить вложения</DialogTitle>
+        <DialogContent>
+          <input type="file" multiple onChange={handleFileChange} />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleAttachmentClose}>Закрыть</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Отображение списка вложений */}
+      <div className="flex flex-col ml-6 mt-4">
+        {attachments.map((file, index) => (
+          <div key={index} className="flex flex-row items-center gap-2">
+            <span>{file.name}</span>
+            <IconButton onClick={() => handleRemoveAttachment(index)}>
+              <Close />
+            </IconButton>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

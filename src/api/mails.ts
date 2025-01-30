@@ -157,23 +157,11 @@ export class MailService {
     );
   }
 
-  static async SendMessage(
-    subject: string | null,
-    body: string | null,
-    receivers: string[]
-  ): Promise<AxiosResponse<void>> {
-    return api.post<void>(
-      `Mail`,
-      {
-        Subject: subject,
-        Body: body,
-        Receivers: receivers,
+  static async SendMessage(form: FormData): Promise<AxiosResponse<void>> {
+    return api.post<void>(`Mail`, form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
       },
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    });
   }
 }
