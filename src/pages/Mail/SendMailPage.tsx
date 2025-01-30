@@ -21,6 +21,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useState } from "react";
+import { MailService } from "../../api/mails";
 
 const DropdownMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -84,49 +85,26 @@ const DropdownMenu = () => {
   );
 };
 
-/*
-export function SendMailPage() {
-  return (
-    <div>
-      <div className="flex flex-row ml-6 mt-4">
-        <span>Новое сообщение</span>
-      </div>
-      <div className="flex flex-col ml-6 mt-2 mr-6">
-        <TextField id="standard-basic" label="Получатель" variant="standard" />
-        <TextField id="standard-basic" label="Тема" variant="standard" />
-      </div>
-      <div className="flex flex-col ml-6 mt-5 mr-6">
-        <TextField
-          id="outlined-multiline-static"
-          label="Содержимое"
-          multiline
-          rows={20}
-          className="flex flex-col mt-6"
-        />
-      </div>
-      <div className="flex flex-col ml-6">
-        <div className="flex flex-row">
-          <FormControlLabel control={<Switch />} label="Зашифровать" />
-        </div>
-        <div className="flex flex-row">
-          <FormControlLabel control={<Switch />} label="Подписать" />
-        </div>
-      </div>
-      <div className="flex flex-row ml-6 mt-16 gap-2">
-        <Button variant="contained">Отправить</Button>
-        <IconButton aria-label="check">
-          <AttachFileIcon />
-        </IconButton>
-        <DropdownMenu />
-      </div>
-    </div>
-  );
-}*/
-
 export function SendMailPage() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
+
+  const [receiver, setReceiver] = useState<string>("");
+  const [subject, setSubject] = useState<string | null>("");
+  const [body, setBody] = useState<string | null>("");
+
+  const handleReceiverChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setReceiver(event.target.value);
+  };
+
+  const handleSubjectChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSubject(event.target.value);
+  };
+
+  const handleBodyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBody(event.target.value);
+  };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -136,10 +114,18 @@ export function SendMailPage() {
     setAnchorEl(null);
   };
 
-  const handleSendNow = () => {
-    handleMenuClose();
-    // Логика для отправки сейчас
-    console.log("Письмо отправлено сейчас");
+  const handleSendNow = async () => {
+    try {
+      handleMenuClose();
+      if (receiver !== null) {
+        await MailService.SendMessage(subject, body, [receiver]);
+        console.log("Письмо отправлено сейчас");
+      } else {
+        console.log("receiver was null");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleScheduleSend = () => {
@@ -163,8 +149,20 @@ export function SendMailPage() {
         <span>Новое сообщение</span>
       </div>
       <div className="flex flex-col ml-6 mt-2 mr-6">
-        <TextField id="standard-basic" label="Получатель" variant="standard" />
-        <TextField id="standard-basic" label="Тема" variant="standard" />
+        <TextField
+          id="standard-basic"
+          label="Получатель"
+          variant="standard"
+          value={receiver}
+          onChange={handleReceiverChange}
+        />
+        <TextField
+          id="standard-basic"
+          label="Тема"
+          variant="standard"
+          value={subject}
+          onChange={handleSubjectChange}
+        />
       </div>
       <div className="flex flex-col ml-6 mt-5 mr-6">
         <TextField
@@ -173,6 +171,8 @@ export function SendMailPage() {
           multiline
           rows={20}
           className="flex flex-col mt-6"
+          value={body}
+          onChange={handleBodyChange}
         />
       </div>
       <div className="flex flex-col ml-6">
@@ -204,7 +204,7 @@ export function SendMailPage() {
       </Menu>
 
       {/* Диалог для выбора времени отправки */}
-      <Dialog open={openDialog} onClose={handleDialogClose} >
+      <Dialog open={openDialog} onClose={handleDialogClose}>
         <DialogTitle>Запланировать отправку</DialogTitle>
         <DialogContent>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
