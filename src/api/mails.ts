@@ -164,4 +164,14 @@ export class MailService {
       },
     });
   }
+
+  static async SendCryptedAndSignedMessage(
+    form: FormData
+  ): Promise<AxiosResponse<void>> {
+    return api.post<void>(`Mail/sending-crypted-and-signed-message`, form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
 }

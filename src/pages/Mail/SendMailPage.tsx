@@ -20,7 +20,7 @@ import FormatSizeIcon from "@mui/icons-material/FormatSize";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { MailService } from "../../api/mails";
 import { useNavigate } from "react-router-dom";
 import { Close } from "@mui/icons-material";
@@ -95,6 +95,8 @@ export function SendMailPage() {
   const [receivers, setReceiver] = useState<string>("");
   const [subject, setSubject] = useState<string | null>("");
   const [body, setBody] = useState<string | null>("");
+  const [isCrypted, setIsCrypted] = useState<boolean>(false);
+  const [isSigned, setIsSigned] = useState<boolean>(false);
 
   const [attachments, setAttachments] = useState<File[]>([]);
   const [openAttachmentDialog, setOpenAttachmentDialog] = useState(false);
@@ -148,17 +150,22 @@ export function SendMailPage() {
         formData.append("subject", subject!);
         formData.append("body", body!);
 
-        const receiversArray = receivers.split(" ");
-
-        for (let i = 0; i < receiversArray.length; i++) {
-          formData.append(`Receivers[${i}]`, receiversArray[i]);
-        }
-
         attachments.forEach((file) => {
           formData.append("attachments", file);
         });
+        if (isCrypted || isSigned) {
+          formData.append("isCrypted", isCrypted.toString());
+          formData.append("isSigned", isSigned.toString());
+          formData.append("receivers", receivers);
+          await MailService.SendCryptedAndSignedMessage(formData);
+        } else {
+          const receiversArray = receivers.split(" ");
 
-        await MailService.SendMessage(formData);
+          for (let i = 0; i < receiversArray.length; i++) {
+            formData.append(`Receivers[${i}]`, receiversArray[i]);
+          }
+          await MailService.SendMessage(formData);
+        }
         console.log("Письмо отправлено сейчас");
         navigation("/");
       } else {
@@ -183,6 +190,22 @@ export function SendMailPage() {
     // Логика для запланированной отправки
     console.log("Письмо запланировано на", scheduledTime);
   };
+
+  function handleIsCryptedChange(
+    event: SyntheticEvent<Element, Event>,
+    checked: boolean
+  ): void {
+    console.log(checked);
+    setIsCrypted(checked);
+  }
+
+  function handleIsSignedChange(
+    event: SyntheticEvent<Element, Event>,
+    checked: boolean
+  ): void {
+    console.log(checked);
+    setIsSigned(checked);
+  }
 
   return (
     <div>
@@ -218,10 +241,22 @@ export function SendMailPage() {
       </div>
       <div className="flex flex-col ml-6">
         <div className="flex flex-row">
-          <FormControlLabel control={<Switch />} label="Зашифровать" />
+          <FormControlLabel
+            control={<Switch />}
+            label="Зашифровать"
+            defaultChecked={false}
+            value={isCrypted}
+            onChange={handleIsCryptedChange}
+          />
         </div>
         <div className="flex flex-row">
-          <FormControlLabel control={<Switch />} label="Подписать" />
+          <FormControlLabel
+            control={<Switch />}
+            label="Подписать"
+            defaultChecked={false}
+            value={isSigned}
+            onChange={handleIsSignedChange}
+          />
         </div>
       </div>
       <div className="flex flex-row ml-6 mt-16 gap-2">
