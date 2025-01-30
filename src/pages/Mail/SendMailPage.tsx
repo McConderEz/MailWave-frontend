@@ -91,6 +91,7 @@ export function SendMailPage() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [scheduledTime, setScheduledTime] = useState<Date | null>(null);
+  const currentDateTime = new Date();
 
   const [receivers, setReceiver] = useState<string>("");
   const [subject, setSubject] = useState<string | null>("");
@@ -318,6 +319,7 @@ export function SendMailPage() {
               label="Выберите дату и время"
               value={scheduledTime}
               onChange={(newValue) => setScheduledTime(newValue)}
+              minDateTime={currentDateTime}
               slotProps={{ textField: { fullWidth: true } }}
             />
           </LocalizationProvider>
