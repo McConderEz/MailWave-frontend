@@ -174,4 +174,14 @@ export class MailService {
       },
     });
   }
+
+  static async SendScheduledMessage(
+    form: FormData
+  ): Promise<AxiosResponse<void>> {
+    return api.post<void>(`Mail/scheduled-message`, form, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
 }

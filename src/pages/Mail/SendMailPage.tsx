@@ -185,9 +185,39 @@ export function SendMailPage() {
     setOpenDialog(false);
   };
 
-  const handleScheduleConfirm = () => {
+  const handleScheduleConfirm = async () => {
     setOpenDialog(false);
-    // Логика для запланированной отправки
+    try {
+      if (receivers) {
+        const formData = new FormData();
+        formData.append("subject", subject!);
+        formData.append("body", body!);
+
+        const isoScheduledTime = new Date(
+          scheduledTime!.getTime() + 3 * 60 * 60 * 1000
+        );
+
+        formData.append("enqueueAt", isoScheduledTime.toISOString());
+
+        console.log(isoScheduledTime.toISOString());
+        attachments.forEach((file) => {
+          formData.append("attachments", file);
+        });
+        const receiversArray = receivers.split(" ");
+
+        for (let i = 0; i < receiversArray.length; i++) {
+          formData.append(`Receivers[${i}]`, receiversArray[i]);
+        }
+        await MailService.SendScheduledMessage(formData);
+
+        console.log("Письмо отправлено сейчас");
+        navigation("/");
+      } else {
+        console.log("Получатель не указан");
+      }
+    } catch (error) {
+      console.log(error);
+    }
     console.log("Письмо запланировано на", scheduledTime);
   };
 
