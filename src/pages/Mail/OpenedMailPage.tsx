@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Divider,
   IconButton,
+  Snackbar,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -21,6 +22,7 @@ import {
   Save,
 } from "@mui/icons-material";
 import { VerificationModal } from "../../components/VerificationModal";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
 const maxFileNameLength = 20;
 
@@ -33,6 +35,32 @@ export function OpenedMailPage() {
   const [verificationResult, setVerificationResult] = useState<string | null>(
     null
   );
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning" | "info"
+  >("error");
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" | "warning" | "info"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -92,6 +120,9 @@ export function OpenedMailPage() {
             console.log(fetchedLetter);
           }
         }
+      } catch (error) {
+        console.log(error);
+        showSnackbar("Произошла ошибка при открытии письма", "error");
       } finally {
         setLoading(false);
       }
@@ -109,6 +140,7 @@ export function OpenedMailPage() {
       setVerificationResult(response.data.result);
       setIsModalOpen(true);
     } catch (error) {
+      showSnackbar("Произошла ошибка при верификации письма", "error");
       console.error("Error verifying message:", error);
       setVerificationResult("Error verifying message");
       setIsModalOpen(true);
@@ -127,6 +159,7 @@ export function OpenedMailPage() {
 
       console.log(`File ${fileName} downloaded`);
     } catch (error) {
+      showSnackbar("Произошла ошибка загрузке вложения", "error");
       console.error("Error downloading file:", error);
     }
   };
@@ -138,6 +171,7 @@ export function OpenedMailPage() {
       navigate("/mail");
     } catch (error) {
       console.log(error);
+      showSnackbar("Произошла ошибка при удалении письма", "error");
     }
   };
 
@@ -148,6 +182,7 @@ export function OpenedMailPage() {
       navigate("/mail");
     } catch (error) {
       console.log(error);
+      showSnackbar("Произошла ошибка при сохранении письма", "error");
     }
   };
 
@@ -157,6 +192,7 @@ export function OpenedMailPage() {
       console.log("accepted friendship");
     } catch (error) {
       console.log(error);
+      showSnackbar("Произошла ошибка при принятия запроса в друзья", "error");
     }
   };
 
@@ -248,6 +284,21 @@ export function OpenedMailPage() {
           )}
         </>
       )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
       <VerificationModal
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}

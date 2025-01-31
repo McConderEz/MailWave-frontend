@@ -1,4 +1,4 @@
-import { Paper, CircularProgress, Box } from "@mui/material";
+import { Paper, CircularProgress, Box, Snackbar } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Letter } from "../../models/Letter";
 import { useSelectedFolder } from "../../contexts/mail/useSelectedFolder";
 import { useNavigate } from "react-router-dom";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", width: 70 },
@@ -42,6 +43,31 @@ export function MailPage() {
     pageSize: 15,
     page: 1,
   });
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning" | "info"
+  >("error");
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" | "warning" | "info"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
 
   const navigation = useNavigate();
 
@@ -123,6 +149,21 @@ export function MailPage() {
           sx={{ border: 0 }}
         />
       )}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
     </Paper>
   );
 }

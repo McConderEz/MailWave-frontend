@@ -8,6 +8,7 @@ import {
   IconButton,
   Menu,
   MenuItem,
+  Snackbar,
   Switch,
   TextField,
 } from "@mui/material";
@@ -24,6 +25,7 @@ import { SyntheticEvent, useRef, useState } from "react";
 import { MailService } from "../../api/mails";
 import { useNavigate } from "react-router-dom";
 import { Close } from "@mui/icons-material";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
 interface SelectedTextRange {
   start: number | null;
@@ -142,6 +144,31 @@ export function SendMailPage() {
   const [attachments, setAttachments] = useState<File[]>([]);
   const [openAttachmentDialog, setOpenAttachmentDialog] = useState(false);
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning" | "info"
+  >("error");
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" | "warning" | "info"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
   const handleAttachmentClick = () => {
     setOpenAttachmentDialog(true);
   };
@@ -211,9 +238,14 @@ export function SendMailPage() {
         navigation("/");
       } else {
         console.log("Получатель не указан");
+        showSnackbar("Получатель не указан", "error");
       }
     } catch (error) {
       console.log(error);
+      showSnackbar(
+        "Произошла ошибка при запланированной отправке письма",
+        "error"
+      );
     }
   };
 
@@ -258,6 +290,10 @@ export function SendMailPage() {
       }
     } catch (error) {
       console.log(error);
+      showSnackbar(
+        "Произошла ошибка при запланированной отправке письма",
+        "error"
+      );
     }
     console.log("Письмо запланировано на", scheduledTime);
   };
@@ -381,7 +417,21 @@ export function SendMailPage() {
           <Button onClick={handleAttachmentClose}>Закрыть</Button>
         </DialogActions>
       </Dialog>
-
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+        >
+          {snackbarMessage}
+        </MuiAlert>
+      </Snackbar>
       {/* Отображение списка вложений */}
       <div className="flex flex-col ml-6 mt-4">
         {attachments.map((file, index) => (

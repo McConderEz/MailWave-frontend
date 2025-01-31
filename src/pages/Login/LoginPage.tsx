@@ -1,9 +1,10 @@
-import { Button, Skeleton, TextField } from "@mui/material";
+import { Button, Skeleton, Snackbar, TextField } from "@mui/material";
 import { ContentBlock } from "../../components/ContentBlock";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../contexts/auth/useAuth";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import MuiAlert, { AlertProps } from "@mui/material/Alert";
 
 type LoginFields = {
   email: string;
@@ -17,11 +18,41 @@ export function LoginPage() {
     formState: { errors, isLoading },
   } = useForm<LoginFields>();
 
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "success" | "error" | "warning" | "info"
+  >("error");
+
+  const handleSnackbarClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSnackbarOpen(false);
+  };
+
+  const showSnackbar = (
+    message: string,
+    severity: "success" | "error" | "warning" | "info"
+  ) => {
+    setSnackbarMessage(message);
+    setSnackbarSeverity(severity);
+    setSnackbarOpen(true);
+  };
+
   const { login, accessToken } = useAuth();
   const navigate = useNavigate();
 
   const onSubmit = async (data: LoginFields) => {
-    await login(data.email, data.password);
+    try {
+      await login(data.email, data.password);
+    } catch (error) {
+      showSnackbar("Произошла ошибка авторизации", "error");
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -89,6 +120,21 @@ export function LoginPage() {
                     </Button>
                   </form>
                 </div>
+                <Snackbar
+                  open={snackbarOpen}
+                  autoHideDuration={6000}
+                  onClose={handleSnackbarClose}
+                  anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+                >
+                  <MuiAlert
+                    elevation={6}
+                    variant="filled"
+                    onClose={handleSnackbarClose}
+                    severity={snackbarSeverity}
+                  >
+                    {snackbarMessage}
+                  </MuiAlert>
+                </Snackbar>
               </ContentBlock>
             </div>
           </main>
