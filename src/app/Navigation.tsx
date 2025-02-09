@@ -132,7 +132,7 @@ export default function SlideBar() {
             </IconButton>
           </div>
           <List>
-            {["Входящие", "Отправленные", "Черновики","Спам", "Корзина"].map(
+            {["Входящие", "Отправленные", "Черновики","Спам", "Корзина", "Сохранённые"].map(
               (text, index) => (
                 <ListItem key={text} disablePadding>
                   <ListItemButton onClick={() => handleListItemClick(index)}>

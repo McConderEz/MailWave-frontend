@@ -81,7 +81,11 @@ export function OpenedMailPage() {
 
           let response;
 
-          if (isCrypted || isSigned) {
+          if (selectedIndex == 5) {
+            response = await MailService.getSavedMessageFromDatabaseById(
+              Number(id)
+            );
+          } else if (isCrypted || isSigned) {
             response =
               await MailService.getCryptedAndSignedMessageFromFolderById(
                 Number(id),
@@ -218,9 +222,13 @@ export function OpenedMailPage() {
           <div className="flex flex-row justify-between">
             <h1 className="pl-6 pt-4 text-[26px]">{letter?.subject}</h1>
             <div className="pr-6 pt-4">
-              <IconButton aria-label="check" onClick={handleSave}>
-                <Save />
-              </IconButton>
+              {selectedIndex !== 5 ? (
+                <IconButton aria-label="check" onClick={handleSave}>
+                  <Save />
+                </IconButton>
+              ) : (
+                <div />
+              )}
               <IconButton aria-label="check" onClick={handleDelete}>
                 <Delete />
               </IconButton>

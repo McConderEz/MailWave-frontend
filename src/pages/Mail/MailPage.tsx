@@ -42,8 +42,9 @@ export function MailPage() {
     { index: 0, name: "Входящие" },
     { index: 1, name: "Отправленные" },
     { index: 2, name: "Черновики" },
-    { index: 3, name: "Корзина" },
-    { index: 4, name: "Спам" },
+    { index: 3, name: "Спам" },
+    { index: 4, name: "Корзина" },
+    { index: 5, name: "Сохранённые" },
   ];
 
   const getAvailableFolders = (currentFolderIndex: number) => {
@@ -126,15 +127,26 @@ export function MailPage() {
     const fetchMessages = async () => {
       setLoading(true);
       try {
-        const response = await MailService.getMessagesFromFolderWithPagination(
-          selectedIndex,
-          pagination.page,
-          pagination.pageSize
-        );
+        let response;
+        let rowCountResponse;
+        if (selectedIndex != 5) {
+          response = await MailService.getMessagesFromFolderWithPagination(
+            selectedIndex,
+            pagination.page,
+            pagination.pageSize
+          );
 
-        const rowCountResponse = await MailService.getMessagesCountFromFolder(
-          selectedIndex
-        );
+          rowCountResponse = await MailService.getMessagesCountFromFolder(
+            selectedIndex
+          );
+        } else {
+          response =
+            await MailService.getSavedMessagesFromDatabaseWithPagination(
+              pagination.page,
+              pagination.pageSize
+            );
+          rowCountResponse = await MailService.getMessagesCountFromFolder(0);
+        }
 
         setRowsCount(rowCountResponse.data.result!);
         setRows(response.data.result!);

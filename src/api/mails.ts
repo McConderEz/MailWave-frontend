@@ -18,6 +18,18 @@ export class MailService {
     });
   }
 
+  static async getSavedMessagesFromDatabaseWithPagination(
+    page: number,
+    pageSize: number
+  ): Promise<AxiosResponse<Envelope<Letter[]>>> {
+    return api.get<Envelope<Letter[]>>("Mail/saved-messages", {
+      params: {
+        page: page,
+        pageSize: pageSize,
+      },
+    });
+  }
+
   static async getMessagesCountFromFolder(
     folder: number
   ): Promise<AxiosResponse<Envelope<number>>> {
@@ -40,6 +52,12 @@ export class MailService {
         },
       }
     );
+  }
+
+  static async getSavedMessageFromDatabaseById(
+    messageId: number
+  ): Promise<AxiosResponse<Envelope<Letter>>> {
+    return api.get<Envelope<Letter>>(`Mail/${messageId}/saved-message`);
   }
 
   static async getCryptedAndSignedMessageFromFolderById(
